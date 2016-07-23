@@ -1,20 +1,23 @@
 {
-  "name": "Service",
+  "name": "Order",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "name": {
+    "customerName": {
+      "type": "string"
+    },
+    "customerTel": {
       "type": "string",
       "required": true
     },
-    "wearType": {
-      "type": "string",
+    "orderDate": {
+      "type": "date",
       "required": true
     },
-    "price": {
+    "amount": {
       "type": "number",
       "required": true
     }

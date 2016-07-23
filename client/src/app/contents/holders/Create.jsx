@@ -3,32 +3,28 @@ import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import Toolbar from 'material-ui/Toolbar'
 import ToolbarGroup from 'material-ui/Toolbar/ToolbarGroup'
+import SelectField from 'material-ui/SelectField'
+import MenuItem from 'material-ui/MenuItem'
 
 import lodash from 'lodash'
 import call from '../../api'
 
-class CreateService extends React.Component {
+class CreateWork extends React.Component {
 
-  static defaultFlow = ['开始', '就绪', '结束']
 
   submit() {
-    const inputFlow = this.refs.flow.getValue()
-    let flow = CreateService.defaultFlow
-    if (inputFlow !== '') {
-      const head = CreateService.defaultFlow.shift()
-      flow = lodash.concat(head, inputFlow.split(','), CreateService.defaultFlow)
-    }
-    const name = this.refs.name.getValue()
+    const code = this.refs.code.getValue()
+    const state = this.refs.state.getValue()
 
-    call('services', 'POST', {name, flow}).then((res) => {
-      if (res) {
-        window.location = '/#/services/list'
+    call('holders', 'POST', {code, state}).then(res => {
+      if (res.status === 200) {
+        window.location = '#/holders/list'
       }
     })
   }
 
   cancel() {
-    window.location = '/#/services/list'
+    window.location = '/#/holders/list'
   }
 
   render() {
@@ -43,15 +39,16 @@ class CreateService extends React.Component {
       <div>
         <div>
           <TextField
-            hintText="名称"
-            floatingLabelText="名称"
-            ref="name"
+            hintText="编号"
+            floatingLabelText="编号"
+            ref="code"
           />
-          <br />
+          <br/>
           <TextField
-            hintText="流程(多个流程以英文逗号分隔)"
-            floatingLabelText="流程"
-            ref="flow"
+            hintText="状态"
+            value="可用"
+            floatingLabelText="状态"
+            ref="state"
           />
         </div>
         <Toolbar style={actionBarStyle}>
@@ -73,5 +70,5 @@ class CreateService extends React.Component {
     )
   }
 }
-export default CreateService
+export default CreateWork
 

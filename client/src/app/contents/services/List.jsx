@@ -2,6 +2,7 @@ import React from 'react'
 import DataTable from '../../components/DataTable/DataTable.jsx'
 
 import call from '../../api'
+import store from '../../store'
 
 class ListServices extends React.Component {
 
@@ -10,6 +11,17 @@ class ListServices extends React.Component {
     this.state = {
       items: [],
       count: 0,
+    }
+  }
+
+  toCreatePage() {
+    window.location = '#/services/create'
+  }
+
+  toDetailPage(selectedItem) {
+    return function () {
+      store.selection = selectedItem
+      window.location = '#/services/detail'
     }
   }
 
@@ -36,7 +48,6 @@ class ListServices extends React.Component {
         `services/count`
     call(countEndpoint, 'GET').then(res => {
       res.json().then(data => {
-        console.log(data.count)
         this.setState({
           count: data.count
         })
@@ -65,6 +76,8 @@ class ListServices extends React.Component {
         items={this.state.items}
         count={this.state.count}
         fetchItems={::this.fetchItems}
+        toCreatePage={this.toCreatePage}
+        toDetailPage={this.toDetailPage}
       />
     )
   }

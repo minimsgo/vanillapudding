@@ -25,7 +25,16 @@ class DataTable extends React.Component {
       searchField: '',
       searchKeyword: '',
       timer: null,
+      showDetailButton: false,
+      selectedRows: [],
     }
+  }
+
+  handleRowSelection(selectedRows) {
+    this.setState({
+      showDetailButton: selectedRows.length === 1,
+      selectedRows,
+    })
   }
 
   componentDidMount() {
@@ -50,14 +59,24 @@ class DataTable extends React.Component {
 
   makeWhere(schema, field, inputKeyword) {
     const type = schema.filter(s => s.name == field)[0].type
-    if (type === 'string' && inputKeyword !== '') {
+
+    if(inputKeyword === '') {
+      this.setState({page: 1})
+      return null
+    }
+    if (type === 'string') {
       return {
         field,
         op: 'like',
         value: `%25${inputKeyword}%25`
       }
-    } else {
-      return null
+    }
+    if (type === 'number') {
+      return {
+        field,
+        op: false,
+        value: inputKeyword
+      }
     }
   }
 
@@ -86,40 +105,24 @@ class DataTable extends React.Component {
     this.setState({searchKeyword: newValue, timer})
   }
 
-  prev() {
-    const page = this.state.page - 1
-    this.props.fetchItems({
-      where: this.makeWhere(
-        this.props.schema,
-        this.state.searchField,
-        this.state.searchKeyword,
-      ),
-      pagination: {
+  nearbyPage(n) {
+    return function () {
+      const page = this.state.page + n
+      this.props.fetchItems({
+        where: this.makeWhere(
+          this.props.schema,
+          this.state.searchField,
+          this.state.searchKeyword,
+        ),
+        pagination: {
+          page,
+          perPage: this.state.perPage,
+        }
+      })
+      this.setState({
         page,
-        perPage: this.state.perPage,
-      }
-    })
-    this.setState({
-      page,
-    })
-  }
-
-  next() {
-    const page = this.state.page + 1
-    this.props.fetchItems({
-      where: this.makeWhere(
-        this.props.schema,
-        this.state.searchField,
-        this.state.searchKeyword,
-      ),
-      pagination: {
-        page,
-        perPage: this.state.perPage,
-      }
-    })
-    this.setState({
-      page,
-    })
+      })
+    }
   }
 
   render() {
@@ -130,10 +133,13 @@ class DataTable extends React.Component {
     const total = Math.floor(this.props.count / this.state.perPage) + 1
     const isLast = this.state.page === total
 
+    const selectedItem = this.props.items[this.state.selectedRows[0]]
+
     return (
       <div>
         <ActionBar
-          toDetailPage={this.props.toDetailPage}
+          showDetailButton={this.state.showDetailButton}
+          toDetailPage={this.props.toDetailPage(selectedItem)}
           toCreatePage={this.props.toCreatePage}
           schema={this.props.schema}
           searchableFields={searchableFields}
@@ -145,12 +151,14 @@ class DataTable extends React.Component {
         <DataList
           schema={this.props.schema}
           items={this.props.items}
+          handleRowSelection={::this.handleRowSelection}
+          selectedRows={this.state.selectedRows}
         />
         <Pagination
           showPrev={this.state.page !== 1}
           showNext={!isLast}
-          prev={::this.prev}
-          next={::this.next}
+          prev={this.nearbyPage(-1).bind(this)}
+          next={this.nearbyPage(1).bind(this)}
           current={`${this.state.page} / ${total}`}
         />
       </div>

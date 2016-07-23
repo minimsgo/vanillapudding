@@ -14,25 +14,38 @@
     ]
   },
   "User": {
-    "dataSource": "db"
+    "dataSource": "VanillaPuddingDataSource",
+    "public": true
   },
   "AccessToken": {
-    "dataSource": "db",
+    "dataSource": "VanillaPuddingDataSource",
     "public": false
   },
   "ACL": {
-    "dataSource": "db",
+    "dataSource": "VanillaPuddingDataSource",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "db",
+    "dataSource": "VanillaPuddingDataSource",
     "public": false
   },
   "Role": {
-    "dataSource": "db",
+    "dataSource": "VanillaPuddingDataSource",
     "public": false
   },
   "Service": {
+    "dataSource": "VanillaPuddingDataSource",
+    "public": true
+  },
+  "Wear": {
+    "dataSource": "VanillaPuddingDataSource",
+    "public": true
+  },
+  "Holder": {
+    "dataSource": "VanillaPuddingDataSource",
+    "public": true
+  },
+  "Order": {
     "dataSource": "VanillaPuddingDataSource",
     "public": true
   }

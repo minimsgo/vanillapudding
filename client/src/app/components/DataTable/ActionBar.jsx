@@ -11,6 +11,7 @@ import SearchIcon from '../Icons/SearchIcon'
 export default class ActionBar extends React.Component {
 
   static propTypes = {
+    showDetailButton: React.PropTypes.bool,
     toDetailPage: React.PropTypes.func,
     toCreatePage: React.PropTypes.func,
     searchableFields: React.PropTypes.array,
@@ -79,6 +80,7 @@ export default class ActionBar extends React.Component {
         <ToolbarGroup>
           <RaisedButton
             label="详细信息"
+            disabled={!this.props.showDetailButton}
             onTouchTap={this.props.toDetailPage}
           />
           <RaisedButton

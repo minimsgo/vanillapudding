@@ -13,24 +13,24 @@ import TableRowColumn from 'material-ui/Table/TableRowColumn'
 import TableBody from 'material-ui/Table/TableBody'
 import lodash from 'lodash'
 
-import callApi from '../../../middlewares/api'
+import call from '../../api'
 
 class CreateOrder extends React.Component {
   constructor() {
     super()
     this.state = {
-      orderProducts: [],
-      products: [],
-      filtratedProducts: [],
-      currentProduct: {},
+      orderedWorks: [],
+      works: [],
+      selectedService: null,
     }
   }
 
-  componentWillMount() {
-    callApi('products', 'GET').then((res) => {
-      this.setState({
-        products: res,
-        filtratedProducts: res,
+  componentDidMount() {
+    call('works?filter[include]=service', 'GET').then(res => {
+      res.json().then(works => {
+        this.setState({
+          works: works,
+        })
       })
     })
   }
@@ -40,10 +40,12 @@ class CreateOrder extends React.Component {
       customerTel: this.refs.customerTel.getValue(),
       customerName: this.refs.customerName.getValue(),
       amount: this.refs.amount.getValue(),
-      orderProducts: this.state.orderProducts.map(item => item.id),
+      orderedWorks: this.state.orderedWorks,
     }
-    callApi('orders', 'POST', order).then(res => {
-      // this.cancel()
+    call('orders/createWithWorks', 'POST', {order}).then(res => {
+      if(res.status === 200) {
+        window.location = '#/orders/list'
+      }
     })
   }
 
@@ -52,45 +54,16 @@ class CreateOrder extends React.Component {
   }
 
   handleServiceChange(event, index, value) {
-    const filtratedProducts = this.state.products.filter(item => item.service.name === value)
-    if (filtratedProducts.length === 1) {
-      const orderProducts = this.state.orderProducts
-      orderProducts.push(filtratedProducts[0])
-      this.setState({
-        currentProduct: {},
-        orderProducts,
-        filtratedProducts,
-      })
-    } else {
-      this.setState({
-        currentProduct: {
-          type: this.state.currentProduct.type,
-          serviceName: value,
-        },
-        filtratedProducts,
-      })
-    }
+    this.setState({
+      selectedService: value
+    })
   }
 
-  handleTypeChange(event, index, value) {
-    const filtratedProducts = this.state.products.filter(item => item.type === value)
-    if (filtratedProducts.length === 1) {
-      const orderProducts = this.state.orderProducts
-      orderProducts.push(filtratedProducts[0])
-      this.setState({
-        currentProduct: {},
-        orderProducts,
-        filtratedProducts: this.state.products,
-      })
-    } else {
-      this.setState({
-        currentProduct: {
-          type: value,
-          serviceName: this.state.currentProduct.serviceName,
-        },
-        filtratedProducts,
-      })
-    }
+  handleWearTypeChange(event, index, value) {
+    const newWork = this.state.works.filter(w => w.id === value)[0]
+    let orderedWorks = this.state.orderedWorks
+    orderedWorks.push(newWork)
+    this.setState({orderedWorks})
   }
 
   render() {
@@ -115,17 +88,15 @@ class CreateOrder extends React.Component {
             floatingLabelText="客户姓名"
             ref="customerName"
           />
-          <br />
+          <br/>
           <TextField
             hintText="金额"
             floatingLabelText="金额"
-            disabled
-            value={
-              this.state.orderProducts.map(item => item.price).reduce(lodash.add, 0)
-            }
+            value={this.state.orderedWorks.map(i => i.price)
+              .reduce((a, b) => a + b, 0)}
+            disabled={true}
             ref="amount"
           />
-          <br />
         </div>
 
         <Table>
@@ -134,15 +105,14 @@ class CreateOrder extends React.Component {
               <TableHeaderColumn>
                 <SelectField
                   hintText="服务项目"
-                  value={this.state.currentProduct.serviceName}
+                  value={this.state.selectedService}
                   onChange={::this.handleServiceChange}
                 >
-                  { this.state.products.map((item, index) =>
+                  { this.state.works.map((item, index) =>
                     <MenuItem
                       key={index}
                       value={item.service.name}
                       primaryText={item.service.name}
-
                     />
                   )}
                 </SelectField>
@@ -150,16 +120,20 @@ class CreateOrder extends React.Component {
               <TableHeaderColumn>
                 <SelectField
                   hintText="衣物类型"
-                  value={this.state.currentProduct.type}
-                  onChange={::this.handleTypeChange}
+                  onChange={::this.handleWearTypeChange}
                 >
-                  { this.state.filtratedProducts.map((item, index) =>
-                    <MenuItem
-                      key={index}
-                      value={item.type}
-                      primaryText={item.type}
-                    />
-                  )}
+                  {
+                    this.state.works.filter(
+                      w => w.service.name === this.state.selectedService).map(
+                        (work, index) =>
+                          <MenuItem
+                            key={index}
+                            value={work.id}
+                            primaryText={work.wearType}
+                          />
+                        )
+                  }
+
                 </SelectField>
               </TableHeaderColumn>
               <TableHeaderColumn>价格</TableHeaderColumn>
@@ -167,16 +141,16 @@ class CreateOrder extends React.Component {
           </TableHeader>
           <TableBody>
             {
-              this.state.orderProducts.map((item, index) =>
+              this.state.orderedWorks.map((work, index) =>
                 <TableRow key={index}>
                   <TableRowColumn>
-                    {item.service.name}
+                    {work.service.name}
                   </TableRowColumn>
                   <TableRowColumn>
-                    {item.type}
+                    {work.wearType}
                   </TableRowColumn>
                   <TableRowColumn>
-                    {item.price}
+                    {work.price}
                   </TableRowColumn>
                 </TableRow>
               )
@@ -185,7 +159,7 @@ class CreateOrder extends React.Component {
         </Table>
         <br />
         <Toolbar style={actionBarStyle}>
-          <ToolbarGroup float="left">
+          <ToolbarGroup>
             <RaisedButton
               style={actionStyle}
               label="取消"

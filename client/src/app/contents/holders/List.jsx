@@ -4,7 +4,7 @@ import DataTable from '../../components/DataTable/DataTable.jsx'
 import call from '../../api'
 import store from '../../store'
 
-class ListOrders extends React.Component {
+class ListHolders extends React.Component {
 
   constructor() {
     super()
@@ -15,13 +15,13 @@ class ListOrders extends React.Component {
   }
 
   toCreatePage() {
-    window.location = '#/orders/create'
+    window.location = '#/holders/create'
   }
 
   toDetailPage(selectedItem) {
     return function () {
       store.selection = selectedItem
-      window.location = '#/orders/detail'
+      window.location = '#/holders/detail'
     }
   }
 
@@ -33,20 +33,21 @@ class ListOrders extends React.Component {
       where ? `filter[where][${where.field}][${where.op}]=${where.value}` : null
 
     const endpoint =
-      whereQueryString ? `orders?filter[include][wears]&${paginationQueryString}&${whereQueryString}` :
-        `orders?filter[include][wears]&${paginationQueryString}`
+      whereQueryString ? `holders?${paginationQueryString}&${whereQueryString}` :
+        `holders?${paginationQueryString}`
     call(endpoint, 'GET').then(res => {
       res.json().then(data => {
+        const items = data
         this.setState({
-          items: data
+          items
         })
       })
     })
 
     const countEndpoint =
       where ?
-        `orders/count?[where][${where.field}][${where.op}]=${where.value}` :
-        `orders/count`
+        `holders/count?[where][${where.field}][${where.op}]=${where.value}` :
+        `holders/count`
     call(countEndpoint, 'GET').then(res => {
       res.json().then(data => {
         this.setState({
@@ -60,25 +61,15 @@ class ListOrders extends React.Component {
   render() {
     const schema = [
       {
-        name: 'customerTel',
-        displayName: '客户电话',
-        type: 'string',
-      },
-      {
-        name: 'customerName',
-        displayName: '客户姓名',
-        type: 'string',
-      },
-      {
-        name: 'orderDate',
-        displayName: '下单时间',
-        type: 'date',
-      },
-      {
-        name: 'amount',
-        displayName: '金额',
+        name: 'code',
+        displayName: '编号',
         type: 'number',
       },
+      {
+        name: 'state',
+        displayName: '状态',
+        type: 'string',
+      }
     ]
 
     return (
@@ -94,4 +85,4 @@ class ListOrders extends React.Component {
   }
 }
 
-export default ListOrders
+export default ListHolders

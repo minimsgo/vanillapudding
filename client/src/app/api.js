@@ -2,7 +2,7 @@ import Uri from 'jsuri'
 
 import {getAccessToken} from './authenticate'
 
-const API_ROOT = 'http://localhost:3000/api/'
+const API_ROOT = 'http://192.168.1.103:3000/api/'
 const LOGIN_END_POINT = 'Users/login'
 
 function call(endpoint, method, body) {

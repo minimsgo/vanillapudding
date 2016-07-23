@@ -3,71 +3,71 @@ import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import Toolbar from 'material-ui/Toolbar'
 import ToolbarGroup from 'material-ui/Toolbar/ToolbarGroup'
+import SelectField from 'material-ui/SelectField'
+import MenuItem from 'material-ui/MenuItem'
 
 import call from '../../api'
 import store from '../../store'
 
-class EditService extends React.Component {
+class WorkDetail extends React.Component {
 
   constructor() {
     super()
     this.state = {
-      item: {},
+      code: -1,
+      state: '',
+      id: -1,
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const item = store.selection
     if (item) {
       this.setState({
-        item,
+        code: item.code,
+        state: item.state,
+        id: item.id
       })
     } else {
-      window.location = '/#/services/list'
+      window.location = '/#/holders/list'
     }
   }
 
   submit() {
-    const formatItem = this.state.item
-    formatItem.flow = JSON.parse(formatItem.flow)
-    call(`services/${this.state.item.id}`, 
-      'PUT', formatItem).then((res) => {
-      if (res) {
-        window.location = '/#/services/list'
+    const holder = {
+      code: this.state.code,
+      state: this.state.state,
+    }
+    call(`holders/${this.state.id}`, 'PUT', holder).then((res) => {
+      if (res.status === 200) {
+        window.location = '/#/holders/list'
       }
     })
   }
 
   deleteItem() {
-    call(`services/${this.state.item.id}`, 'DELETE')
-      .then((res) => {
-      if (res) {
-        window.location = '/#/services/list'
-      }
-    })
+    call(`holders/${this.state.id}`, 'DELETE')
+      .then(res => {
+        if (res.status === 200) {
+          window.location = '/#/holders/list'
+        }
+      })
   }
 
   cancel() {
-    window.location = '/#/services/list'
+    window.location = '/#/holders/list'
   }
 
-  handleNameChange(event, value) {
+
+  handleCodeChange(event, value) {
     this.setState({
-      item: {
-        name: value,
-        flow: this.state.item.flow,
-        id: this.state.item.id,
-      },
+      code: value,
     })
   }
 
-  handleFlowChange(event, value) {
+  handleStateChange(event, value) {
     this.setState({
-      item: {
-        id: this.state.item.id,
-        name: this.state.item.name,
-        flow: value 
-      },
+      state: value,
     })
   }
 
@@ -83,23 +83,23 @@ class EditService extends React.Component {
       <div>
         <div>
           <TextField
-            hintText="名称"
-            floatingLabelText="名称"
-            value={this.state.item.name}
-            onChange={::this.handleNameChange}
+            hintText="编号"
+            floatingLabelText="编号"
+            onChange={::this.handleCodeChange}
+            value={this.state.code}
           />
           <br />
           <TextField
-            hintText="流程"
-            floatingLabelText="流程"
-            value={this.state.item.flow}
-            onChange={::this.handleFlowChange}
+            hintText="状态"
+            floatingLabelText="状态"
+            onChange={::this.handleStateChange}
+            value={this.state.state}
           />
           <br />
         </div>
         <br />
         <Toolbar style={actionBarStyle}>
-          <ToolbarGroup float="left">
+          <ToolbarGroup>
             <RaisedButton
               style={actionStyle}
               label="取消"
@@ -123,5 +123,5 @@ class EditService extends React.Component {
     );
   }
 }
-export default EditService;
+export default WorkDetail;
 

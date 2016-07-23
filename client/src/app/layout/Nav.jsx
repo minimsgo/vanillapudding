@@ -6,7 +6,7 @@ import {cyan500} from 'material-ui/styles/colors';
 const SelectableList = MakeSelectable(List)
 
 class Nav extends React.Component {
-  
+
   handleTouchTapHeader() {
     window.location = '#/'
   }
@@ -49,6 +49,8 @@ class Nav extends React.Component {
           onChange={onRoute}
         >
           <ListItem primaryText="服务项目" value="/services"/>
+          <ListItem primaryText="价格设置" value="/works"/>
+          <ListItem primaryText="挂衣号" value="/holders"/>
           <ListItem primaryText="订单管理" value="/orders"/>
         </SelectableList>
       </Drawer>

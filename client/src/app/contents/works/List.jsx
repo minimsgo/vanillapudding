@@ -4,7 +4,7 @@ import DataTable from '../../components/DataTable/DataTable.jsx'
 import call from '../../api'
 import store from '../../store'
 
-class ListOrders extends React.Component {
+class ListWorks extends React.Component {
 
   constructor() {
     super()
@@ -15,13 +15,13 @@ class ListOrders extends React.Component {
   }
 
   toCreatePage() {
-    window.location = '#/orders/create'
+    window.location = '#/works/create'
   }
 
   toDetailPage(selectedItem) {
     return function () {
       store.selection = selectedItem
-      window.location = '#/orders/detail'
+      window.location = '#/works/detail'
     }
   }
 
@@ -33,20 +33,25 @@ class ListOrders extends React.Component {
       where ? `filter[where][${where.field}][${where.op}]=${where.value}` : null
 
     const endpoint =
-      whereQueryString ? `orders?filter[include][wears]&${paginationQueryString}&${whereQueryString}` :
-        `orders?filter[include][wears]&${paginationQueryString}`
+      whereQueryString ? `works?filter[include]=service&${paginationQueryString}&${whereQueryString}` :
+        `works?filter[include]=service&${paginationQueryString}`
     call(endpoint, 'GET').then(res => {
       res.json().then(data => {
+        const items = data.map(i => {
+          return Object.assign(i, {
+            serviceName: i.service.name
+          })
+        })
         this.setState({
-          items: data
+          items
         })
       })
     })
 
     const countEndpoint =
       where ?
-        `orders/count?[where][${where.field}][${where.op}]=${where.value}` :
-        `orders/count`
+        `works/count?[where][${where.field}][${where.op}]=${where.value}` :
+        `works/count`
     call(countEndpoint, 'GET').then(res => {
       res.json().then(data => {
         this.setState({
@@ -60,23 +65,18 @@ class ListOrders extends React.Component {
   render() {
     const schema = [
       {
-        name: 'customerTel',
-        displayName: '客户电话',
+        name: 'serviceName',
+        displayName: '服务项目',
         type: 'string',
       },
       {
-        name: 'customerName',
-        displayName: '客户姓名',
+        name: 'wearType',
+        displayName: '衣物类型',
         type: 'string',
       },
       {
-        name: 'orderDate',
-        displayName: '下单时间',
-        type: 'date',
-      },
-      {
-        name: 'amount',
-        displayName: '金额',
+        name: 'price',
+        displayName: '价格',
         type: 'number',
       },
     ]
@@ -94,4 +94,4 @@ class ListOrders extends React.Component {
   }
 }
 
-export default ListOrders
+export default ListWorks

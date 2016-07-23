@@ -6,42 +6,49 @@ import ToolbarGroup from 'material-ui/Toolbar/ToolbarGroup'
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
 
-import callApi from '../../../middlewares/api'
+import lodash from 'lodash'
+import call from '../../api'
 
-class CreateProduct extends React.Component {
-  
-  constructor(){
+class CreateWork extends React.Component {
+
+  constructor() {
     super()
     this.state = {
-      item: {},
       services: [],
-      selectedServiceId: '',
+      selected: null,
     }
   }
 
-  componentWillMount(){
-    callApi('services', 'GET').then((res) => {
-      this.setState({
-        services: res,
+  componentDidMount() {
+    call('services', 'GET').then(res => {
+      res.json().then(data => {
+        this.setState({
+          services: data
+        })
       })
     })
   }
 
   submit() {
-    const product = {
-      serviceId: this.state.selectedServiceId,
-      type: this.refs.type.getValue(),
-      price: this.refs.price.getValue(),
-    }
-    callApi('products', 'POST', product).then((res) => {
-      if (res) {
-        window.location = '/#/products/list'
+    const wearType = this.refs.wearType.getValue()
+    const price = this.refs.price.getValue()
+    const serviceId = this.state.selected
+
+    call('works', 'POST', {serviceId, wearType, price}).then(res => {
+      if (res.status === 200) {
+        window.location = '#/works/list'
       }
     })
   }
 
   cancel() {
-    window.location = '/#/products/list'
+    window.location = '/#/works/list'
+  }
+
+  selectService(event, index, value) {
+    this.setState({
+      selected: value
+    })
   }
 
   render() {
@@ -51,45 +58,38 @@ class CreateProduct extends React.Component {
     const actionStyle = {
       marginLeft: -10,
     }
-   
+
     return (
       <div>
         <div>
           <SelectField
-            hintText="服务项目"
-            value={this.state.selectedServiceId}
-            onChange={(event, index, value) => {
-              this.setState({
-                selectedServiceId: value, 
-              })
-            }}
+            value={this.state.selected}
+            onChange={::this.selectService}
+            floatingLabelText="服务项目"
           >
-            {this.state.services.map((item, index) =>
+            {this.state.services.map((service, index) =>
               <MenuItem
                 key={index}
-                value={item.id}
-                primaryText={item.name}
+                value={service.id}
+                primaryText={service.name}
               />
             )}
           </SelectField>
-          <br />
-          
+          <br/>
           <TextField
             hintText="衣物类型"
             floatingLabelText="衣物类型"
-            ref="type"
+            ref="wearType"
           />
-          <br />
+          <br/>
           <TextField
             hintText="价格"
             floatingLabelText="价格"
             ref="price"
           />
-          <br />
-          
         </div>
         <Toolbar style={actionBarStyle}>
-          <ToolbarGroup float="left">
+          <ToolbarGroup>
             <RaisedButton
               style={actionStyle}
               label="取消"
@@ -104,8 +104,8 @@ class CreateProduct extends React.Component {
           </ToolbarGroup>
         </Toolbar>
       </div>
-    );
+    )
   }
 }
-export default CreateProduct;
+export default CreateWork
 

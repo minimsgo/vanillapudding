@@ -1,21 +1,17 @@
 {
-  "name": "Service",
+  "name": "Holder",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "name": {
-      "type": "string",
-      "required": true
-    },
-    "wearType": {
-      "type": "string",
-      "required": true
-    },
-    "price": {
+    "code": {
       "type": "number",
+      "required": true
+    },
+    "state": {
+      "type": "string",
       "required": true
     }
   },

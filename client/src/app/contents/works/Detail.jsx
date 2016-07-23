@@ -3,85 +3,90 @@ import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import Toolbar from 'material-ui/Toolbar'
 import ToolbarGroup from 'material-ui/Toolbar/ToolbarGroup'
-
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
-import callApi from '../../../middlewares/api'
-import store from '../../../store'
 
-class EditProduct extends React.Component {
+import call from '../../api'
+import store from '../../store'
+
+class WorkDetail extends React.Component {
 
   constructor() {
     super()
     this.state = {
-      item: {},
+      wearType: '',
+      price: 0,
       services: [],
-      serviceId: '',
+      id: '',
+      selected: null,
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const item = store.selection
     if (item) {
       this.setState({
-        item,
-        serviceId: item.serviceId,
+        selected: item.service.id,
+        wearType: item.wearType,
+        price: item.price,
+        id: item.id,
       })
-
-      callApi('services', 'GET').then((res) => {
-        this.setState({
-          services: res,
+      call('services', 'GET').then(res => {
+        res.json().then(data => {
+          this.setState({
+            services: data
+          })
         })
       })
     } else {
-      window.location = '/#/products/list'
+      window.location = '/#/works/list'
     }
   }
 
   submit() {
-    const formatItem = this.state.item
-    formatItem.serviceId = this.state.serviceId
-    callApi(`products/${this.state.item.id}`,
-      'PUT', formatItem).then((res) => {
-      if (res) {
-        window.location = '/#/products/list'
+    const work = {
+      serviceId: this.state.selected,
+      wearType: this.state.wearType,
+      price: this.state.price,
+    }
+    call(`works/${this.state.id}`, 'PUT', work).then((res) => {
+      if (res.status === 200) {
+        window.location = '/#/works/list'
       }
     })
   }
 
   deleteItem() {
-    callApi(`products/${this.state.item.id}`, 'DELETE')
-      .then((res) => {
+    call(`works/${this.state.id}`, 'DELETE')
+      .then(res => {
         if (res) {
-          window.location = '/#/products/list'
+          window.location = '/#/works/list'
         }
       })
   }
 
   cancel() {
-    window.location = '/#/products/list'
+    window.location = '/#/works/list'
   }
 
-  handleTypeChange(event, value) {
+  selectService(event, index, value) {
     this.setState({
-      item: {
-        type: value,
-        price: this.state.item.price,
-        id: this.state.item.id,
-      },
+      selected: value
+    })
+  }
+
+  handleWearTypeChange(event, value) {
+    this.setState({
+      wearType: value,
     })
   }
 
   handlePriceChange(event, value) {
     this.setState({
-      item: {
-        type: this.state.item.type,
-        price: value,
-        id: this.state.item.id,
-      },
+      price: value,
     })
   }
-  
+
   render() {
     const actionBarStyle = {
       backgroundColor: 'white',
@@ -94,19 +99,15 @@ class EditProduct extends React.Component {
       <div>
         <div>
           <SelectField
-            hintText="服务项目"
-            value={this.state.serviceId}
-            onChange={(event, index, value) => {
-              this.setState({
-                serviceId: value,
-              })
-            }}
+            value={this.state.selected}
+            onChange={::this.selectService}
+            floatingLabelText="服务项目"
           >
-            {this.state.services.map((item, index) =>
+            {this.state.services.map((service, index) =>
               <MenuItem
                 key={index}
-                value={item.id}
-                primaryText={item.name}
+                value={service.id}
+                primaryText={service.name}
               />
             )}
           </SelectField>
@@ -114,21 +115,21 @@ class EditProduct extends React.Component {
           <TextField
             hintText="衣物类型"
             floatingLabelText="衣物类型"
-            value={this.state.item.type}
-            onChange={::this.handleTypeChange}
+            onChange={::this.handleWearTypeChange}
+            value={this.state.wearType}
           />
           <br />
           <TextField
             hintText="价格"
             floatingLabelText="价格"
-            value={this.state.item.price}
             onChange={::this.handlePriceChange}
+            value={this.state.price}
           />
           <br />
         </div>
         <br />
         <Toolbar style={actionBarStyle}>
-          <ToolbarGroup float="left">
+          <ToolbarGroup>
             <RaisedButton
               style={actionStyle}
               label="取消"
@@ -152,4 +153,5 @@ class EditProduct extends React.Component {
     );
   }
 }
-export default EditProduct;
+export default WorkDetail;
+

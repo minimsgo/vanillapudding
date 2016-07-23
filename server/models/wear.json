@@ -1,0 +1,44 @@
+{
+  "name": "Wear",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "barcode": {
+      "type": "string",
+      "required": true
+    },
+    "currentState": {
+      "type": "string",
+      "required": true
+    },
+    "states": {
+      "type": [
+        "object"
+      ],
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "service": {
+      "type": "belongsTo",
+      "model": "Service",
+      "foreignKey": ""
+    },
+    "order": {
+      "type": "belongsTo",
+      "model": "Order",
+      "foreignKey": ""
+    },
+    "holder": {
+      "type": "belongsTo",
+      "model": "Holder",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

@@ -9,48 +9,51 @@ import TableRow from 'material-ui/Table/TableRow'
 import TableHeader from 'material-ui/Table/TableHeader'
 import TableRowColumn from 'material-ui/Table/TableRowColumn'
 import TableBody from 'material-ui/Table/TableBody'
+import lodash from 'lodash'
 
-import callApi from '../../../middlewares/api'
-import store from '../../../store'
+import store from '../../store'
+import call from '../../api'
 
-class OrderDetail extends React.Component {
+class CreateOrder extends React.Component {
   constructor() {
     super()
     this.state = {
-      order: {
-        customerTel: '',
-        customerName: '',
-        amount: 0,
-      },
-      orderItems: [],
+      customerName: '',
+      customerTel: '',
+      amount: 0,
+      wears: [],
     }
   }
 
-  componentWillMount() {
-    const order = store.selection
-    if (order) {
-      const q = { orderId: order.id }
-      callApi(`order_items?q=${JSON.stringify(q)}`, 'GET').then(res => {
-        const orderItems = res.orderItems.map(
-          orderItem => Object.assign(orderItem,{
-            works: res.works.filter(work =>
-              work.orderItemId === orderItem.id
-            ),
-          }))
-        this.setState({
-          order,
-          orderItems,
-        })
-      })
+  componentDidMount() {
+    const selectedOrder = store.selection
+    if (!selectedOrder) {
+      window.location = '#/orders/list'
+
     } else {
-      this.cancel()
+      this.setState({
+        customerName: selectedOrder.customerName,
+        customerTel: selectedOrder.customerTel,
+        amount: selectedOrder.amount,
+      })
+      const self = this
+      const wearsWithWork = selectedOrder.wears.map(
+        function (wear) {
+          console.log(wear.id)
+          call(`wears/${wear.id}?filter[include][work]`, 'GET').then(
+            res => {
+              res.json().then(wear => {
+                const wears = self.state.wears
+                wears.push(wear)
+                self.setState({wears})
+              })
+            }
+          )
+        }
+      )
     }
   }
-  
-  step(item) {
-    const max = Math.max.apply(Math, item.works.map(i => i.step))
-    return item.product.service.flow[item.works[max].step]
-  }
+
 
   cancel() {
     window.location = '/#/orders/list'
@@ -68,23 +71,25 @@ class OrderDetail extends React.Component {
       <div>
         <div>
           <TextField
-            value={this.state.order.customerTel}
+            hintText="客户电话"
+            value={this.state.customerTel}
             floatingLabelText="客户电话"
-            disabled
+            disabled={true}
           />
           <br />
           <TextField
-            value={this.state.order.customerName}
+            hintText="客户姓名"
+            value={this.state.customerName}
             floatingLabelText="客户姓名"
-            disabled
+            disabled={true}
           />
-          <br />
+          <br/>
           <TextField
-            value={this.state.order.amount }
+            hintText="金额"
             floatingLabelText="金额"
-            disabled
+            value={this.state.amount}
+            disabled={true}
           />
-          <br />
         </div>
 
         <Table>
@@ -98,28 +103,20 @@ class OrderDetail extends React.Component {
           </TableHeader>
           <TableBody>
             {
-              this.state.orderItems.map((item, index) =>
+              this.state.wears.map((wear, index) =>
                 <TableRow key={index}>
                   <TableRowColumn>
-                    {item.product.service.name}
-                  </TableRowColumn>
-                  <TableRowColumn>
-                    {item.product.type}
-                  </TableRowColumn>
-                  <TableRowColumn>
-                    {item.product.price}
-                  </TableRowColumn>
-                  <TableRowColumn>
-                    {::this.step(item)}
+                    {wear.workId}
                   </TableRowColumn>
                 </TableRow>
               )
             }
+
           </TableBody>
         </Table>
         <br />
         <Toolbar style={actionBarStyle}>
-          <ToolbarGroup float="left">
+          <ToolbarGroup>
             <RaisedButton
               style={actionStyle}
               label="取消"
@@ -131,5 +128,5 @@ class OrderDetail extends React.Component {
     );
   }
 }
-export default OrderDetail;
+export default CreateOrder;
 
