@@ -1,5 +1,5 @@
 import React from 'react'
-import DataTable from '../../components/DataTable/DataTable.jsx'
+import DataTable from '../../components/DataTableOld/DataTable.jsx'
 
 import call from '../../api'
 import store from '../../store'

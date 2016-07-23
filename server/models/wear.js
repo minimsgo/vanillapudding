@@ -30,16 +30,18 @@ module.exports = function (Wear) {
             'states': newStates
           },
           function (err, updatedWear) {
+            callback(null, updatedWear)
           })
+      } else {
+        callback(null, null)
       }
+
     })
-    callback(null, true)
   }
 
   Wear.remoteMethod('toNextState', {
     accepts: {arg: 'id', type: 'number'},
     http: {path: '/:id/toNextState', verb: 'get'},
-    returns: {arg: 'toNextState', type: 'bool'}
+    returns: {arg: 'updatedWear', type: 'object'}
   })
-
 };

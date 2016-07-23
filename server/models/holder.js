@@ -16,13 +16,12 @@ module.exports = function (Holder) {
           {code: code, state: defaultState},
           function (err, createdHolder) {});
       });
+      callback(null, newCodes.length)
     })
-
-    callback(null, true);
   }
 
   Holder.remoteMethod('createMany', {
     accepts: {arg: 'rangeEnd', type: 'number'},
-    returns: {arg: 'created', type: 'bool'}
+    returns: {arg: 'numCreatedHolders', type: 'number'}
   })
 };

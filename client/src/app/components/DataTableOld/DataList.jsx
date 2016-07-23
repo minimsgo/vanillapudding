@@ -12,13 +12,13 @@ export default class DataList extends React.Component {
   static propTypes = {
     schema: React.PropTypes.array,
     items: React.PropTypes.array,
-    select: React.PropTypes.func,
-    selection: React.PropTypes.array,
+    selectedRows: React.PropTypes.array,
+    handleRowSelection: React.PropTypes.func,
   }
 
   render() {
     return (
-      <Table onRowSelection={this.props.select}>
+      <Table onRowSelection={this.props.handleRowSelection}>
         <TableHeader>
           <TableRow>
             {
@@ -35,7 +35,7 @@ export default class DataList extends React.Component {
             this.props.items.map((item, index) =>
               <TableRow
                 key={index}
-                selected={this.props.selection.indexOf(index) !== -1}
+                selected={this.props.selectedRows.indexOf(index) !== -1}>
               >
                 {
                   this.props.schema.map((field, index) =>

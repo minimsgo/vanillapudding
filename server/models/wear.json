@@ -14,6 +14,14 @@
       "type": "string",
       "required": true
     },
+    "type": {
+      "type": "string",
+      "required": true
+    },
+    "serviceName": {
+      "type": "string",
+      "required": true
+    },
     "states": {
       "type": [
         "object"

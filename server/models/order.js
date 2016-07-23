@@ -1,51 +1,71 @@
+var crypto = require('crypto')
+var biguint = require('biguint-format')
 var app = require('../server')
 module.exports = function (Order) {
 
-  Order.createWithWorks = function (order, cb) {
-    var newOrder = {
-      customerTel: order.customerTel,
-      customerName: order.customerName,
-      amount: order.amount,
+  Order.createWithServices = function (customerName,
+                                       customerTel,
+                                       amount,
+                                       orderedServices,
+                                       callback) {
+
+    var order = {
+      customerName: customerName,
+      customerTel: customerTel,
+      amount: amount,
       orderDate: new Date()
     }
 
-    var works = order.orderedWorks;
+    var orderedServices = [
+      {
+        name: '干洗',
+        wearType: '羽绒服',
+        price: 30,
+        id: 0
+      }
+    ]
 
-    Order.create(newOrder, function (err, createdOrder) {
-      var orderId = createdOrder.id;
-      works.map(function (work) {
-        require('crypto').randomBytes(5, function (ex, buf) {
-
-          //生成条形码
-          var biguint = require('biguint-format');
-          var barcode = biguint(buf, 'dec');
-
-          //计算起始状态
-          app.models.Work.findById(work.id, function (err, work) {
-            app.models.Service.findById(work.serviceId, function (err, service) {
-              var initState = service.flow[0]
-              var wear = {
-                orderId: orderId,
-                workId: work.id,
-                barcode: barcode,
-                states: [{updateDate: new Date(), state: initState}]
-              }
-              app.models.Wear.create(wear, function (err, createdWear) {
-              })
-            })
+    Order.create(order, function (err, createdOrder) {
+      orderedServices.map(function (service) {
+        crypto.randomBytes(5, function (ex, buf) {
+          var barcode = biguint(buf, 'dec')
+          var initState = '开始'
+          var newWear = {
+            orderId: createdOrder.id,
+            serviceId: service.id,
+            barcode: barcode,
+            type: service.wearType,
+            serviceName: service.name,
+            currentState: initState,
+            states: [{
+              updateDate: new Date(),
+              state: initState
+            }]
+          }
+          app.models.Wear.create(newWear, function (err, createdWear) {
           })
-        });
+        })
+      })
+
+      Order.findById(
+        createdOrder.id,
+        {include: 'wears'},
+        function (err, orderWithWears) {
+          callback(null, orderWithWears)
       })
     })
-
-    cb(null, 'created')
   }
 
   Order.remoteMethod(
-    'createWithWorks',
+    'createWithServices',
     {
-      accepts: {arg: 'order', type: 'object'},
-      returns: {arg: 'status', type: 'string'}
+      accepts: [
+        {arg: 'customerName', type: 'string'},
+        {arg: 'customerTel', type: 'string'},
+        {arg: 'amount', type: 'number'},
+        {arg: 'orderedServices', type: 'array'},
+      ],
+      returns: {arg: 'createdOrder', type: 'object'}
     }
   );
 };
