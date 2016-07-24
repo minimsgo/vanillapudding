@@ -14,9 +14,9 @@ class Create extends React.Component {
     submit: React.PropTypes.func,
   }
 
-  submit() {
+  create() {
     const item = lodash.mapValues(this.refs, ref => ref.getValue())
-    this.props.submit(item)
+    this.props.create(item)
   }
 
   render() {
@@ -28,7 +28,7 @@ class Create extends React.Component {
       <FlatButton
         label="确认"
         primary={true}
-        onTouchTap={::this.submit}
+        onTouchTap={::this.create}
       />,
     ]
 

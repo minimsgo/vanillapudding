@@ -26,6 +26,7 @@ class Service extends React.Component {
       <DataTable
         schema={schema}
         endpoint={"services"}
+        perPage={8}
       />
     )
   }

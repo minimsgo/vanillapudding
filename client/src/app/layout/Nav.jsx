@@ -41,7 +41,7 @@ class Nav extends React.Component {
       >
 
         <div style={styles.logo} onTouchTap={this.handleTouchTapHeader}>
-          布丁
+          VanillaPudding
         </div>
 
         <SelectableList

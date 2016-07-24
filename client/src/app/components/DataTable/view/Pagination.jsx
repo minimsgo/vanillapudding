@@ -2,26 +2,30 @@ import React from 'react'
 import FlatButton from 'material-ui/FlatButton'
 
 class Pagination extends React.Component {
+
   static propTypes = {
     showPrev: React.PropTypes.bool,
     showNext: React.PropTypes.bool,
-    prev: React.PropTypes.func,
-    next: React.PropTypes.func,
+    prevPage: React.PropTypes.func,
+    nextPage: React.PropTypes.func,
+    page: React.PropTypes.number,
+    total: React.PropTypes.number,
   }
+
   render() {
     return (
       <div>
         <FlatButton
+          onTouchTap={this.props.prevPage}
           disabled={!this.props.showPrev}
-          onTouchTap={this.props.prev}
           label="上一页"
         />
         <FlatButton
+          onTouchTap={this.props.nextPage}
           disabled={!this.props.showNext}
-          onTouchTap={this.props.next}
           label="下一页"
         />
-        <span>{this.props.current}</span>
+        <span>{this.props.page} / {this.props.total}</span>
       </div>
     )
   }

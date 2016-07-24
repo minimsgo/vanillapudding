@@ -1,95 +1,133 @@
 import React from 'react'
 
-import DataList from './DataList.jsx'
-import Form from './form/Form.jsx'
-import ActionBar from './ActionBar.jsx'
-
+import StateContainer from './state/StateContainer.jsx'
 import call from '../../api'
 
-var selection = []
 
 class DataTable extends React.Component {
 
   static propTypes = {
     schema: React.PropTypes.array,
     endpoint: React.PropTypes.string,
+    perPage: React.PropTypes.number,
   }
 
   constructor() {
     super()
     this.state = {
       items: [],
-      open: false,
-      selection: [],
+      page: 1,
+      total: 0,
     }
   }
 
-  fetch() {
-    call(this.props.endpoint, 'GET').then(res => {
+  componentDidMount() {
+    this.fetch(null, 1)
+  }
+
+  fetch(where, page) {
+    const perPage = this.props.perPage
+    const skip = (page - 1) * perPage
+    const pagination =
+      `filter[skip]=${skip}&filter[limit]=${perPage}`
+
+    const endpoint = where ?
+      `${this.props.endpoint}?${pagination}&filter${where}` :
+      `${this.props.endpoint}?${pagination}`
+
+    call(endpoint, 'GET').then(res => {
       if (res.status !== 200) return
       res.json().then(items => {
-        this.setState({items})
+        this.setState({items, page})
+      })
+    })
+
+    const countEndpoint = where ?
+      `${this.props.endpoint}/count?${where}`:
+      `${this.props.endpoint}/count`
+
+    call(countEndpoint, 'GET').then(res => {
+      if (res.status !== 200) return
+      res.json().then(countObject => {
+        const count = countObject.count
+
+        const total = count % this.props.perPage == 0 ?
+          count / this.props.perPage :
+          Math.floor(count / this.props.perPage) + 1
+        this.setState({total})
       })
     })
   }
 
-  open() {
-    this.setState({
-      open: true
-    })
+  onResponse(res, success) {
+    if (res.status === 200) {
+      this.fetch(null, 1)
+      success()
+    }
   }
 
-  close() {
-    this.setState({ open: false })
+  search(field, keyword, page) {
+    const type = this.props.schema.filter(
+      s => s.name == field)[0].type
+
+    let where = null
+    switch (type) {
+      case 'string':
+        where = `[${field}][like]=%25${keyword}%25`
+        break
+      case 'number':
+        where = `[${field}]=${keyword}`
+        break
+      default:
+        break
+    }
+
+    if (keyword === '') {
+      this.fetch(null, page)
+    } else {
+      this.fetch(`[where]${where}`, page)
+    }
   }
 
-  submit(item) {
-    call(this.props.endpoint, 'POST', item).then(res => {
-      if(res.status === 200){
-        this.setState({
-          open: false,
-        })
-        this.fetch()
-      }
-    })
+  create(success) {
+    const func = function (item) {
+      call(this.props.endpoint, 'POST', item).then(res => {
+        this.onResponse(res, success)
+      })
+    }
+    return func.bind(this)
   }
 
-  componentDidMount() {
-    this.fetch()
+  update(success) {
+    const func = function (id, item) {
+      call(`${this.props.endpoint}/${id}`, 'PUT', item).then(res => {
+        this.onResponse(res, success)
+      })
+    }
+    return func.bind(this)
   }
 
-  select(rows) {
-    this.setState({
-      selection: rows
-    })
-    selection = rows
+  delete(success) {
+    const func = function (id) {
+      call(`${this.props.endpoint}/${id}`, 'DELETE').then(res => {
+        this.onResponse(res, success)
+      })
+    }
+    return func.bind(this)
   }
 
   render() {
-    const item = selection.length > 0 ?
-      this.state.items[selection[0]]: null
     return (
-      <div>
-        <ActionBar
-          create={this.open.bind(this)}
-          detail={this.open.bind(this)}
-          show={this.state.selection.length > 0}
-        />
-        <DataList
-          schema={this.props.schema}
-          items={this.state.items}
-          select={::this.select}
-          selection={this.state.selection}
-        />
-        <Form
-          title="新建"
-          schema={this.props.schema}
-          open={this.state.open}
-          submit={this.submit.bind(this)}
-          close={::this.close}
-          item={item}
-        />
-      </div>
+      <StateContainer
+        schema={this.props.schema}
+        items={this.state.items}
+        create={::this.create}
+        update={::this.update}
+        delete={::this.delete}
+        search={::this.search}
+        page={this.state.page}
+        total={this.state.total}
+      />
     )
   }
 }

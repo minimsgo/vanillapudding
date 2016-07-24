@@ -14,9 +14,13 @@ class Create extends React.Component {
     submit: React.PropTypes.func,
   }
 
-  submit() {
+  update() {
     const item = lodash.mapValues(this.refs, ref => ref.getValue())
-    this.props.submit(item)
+    this.props.update(this.props.item.id, item)
+  }
+
+  delete() {
+    this.props.delete(this.props.item.id)
   }
 
   render() {
@@ -26,15 +30,21 @@ class Create extends React.Component {
         onTouchTap={this.props.close}
       />,
       <FlatButton
+        label="删除"
+        secondary={true}
+        onTouchTap={::this.delete}
+      />,
+      <FlatButton
         label="确认"
         primary={true}
-        onTouchTap={::this.submit}
+        onTouchTap={::this.update}
       />,
     ]
 
     const fields = this.props.schema.map((field, index) =>
       <TextField
         key={index}
+        defaultValue={this.props.item[field.name]}
         hintText={field.displayName}
         floatingLabelText={field.displayName}
         ref={field.name}
@@ -47,7 +57,7 @@ class Create extends React.Component {
         actions={actions}
         open={this.props.open}
         autoScrollBodyContent={true}>
-        Detail
+        {fields}
       </Dialog>
     )
   }
