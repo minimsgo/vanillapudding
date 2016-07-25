@@ -48,7 +48,9 @@ class Nav extends React.Component {
           value={location.pathname}
           onChange={onRoute}
         >
+          <ListItem primaryText="订单管理" value="/order"/>
           <ListItem primaryText="服务项目" value="/service"/>
+          <ListItem primaryText="挂衣号" value="/holder"/>
         </SelectableList>
       </Drawer>
     )

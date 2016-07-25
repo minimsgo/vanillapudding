@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Table from 'material-ui/Table/Table';
 import TableHeaderColumn from 'material-ui/Table/TableHeaderColumn';
 import TableRow from 'material-ui/Table/TableRow'
@@ -6,19 +6,17 @@ import TableHeader from 'material-ui/Table/TableHeader'
 import TableRowColumn from 'material-ui/Table/TableRowColumn'
 import TableBody from 'material-ui/Table/TableBody'
 
-
-export default class DataList extends React.Component {
+//TODO 大数据量性能问题
+class DataList extends Component {
 
   static propTypes = {
     schema: React.PropTypes.array,
     items: React.PropTypes.array,
-    selectedRows: React.PropTypes.array,
-    handleRowSelection: React.PropTypes.func,
   }
 
   render() {
     return (
-      <Table onRowSelection={this.props.handleRowSelection}>
+      <Table>
         <TableHeader>
           <TableRow>
             {
@@ -35,12 +33,15 @@ export default class DataList extends React.Component {
             this.props.items.map((item, index) =>
               <TableRow
                 key={index}
-                selected={this.props.selectedRows.indexOf(index) !== -1}>
               >
                 {
                   this.props.schema.map((field, index) =>
                     <TableRowColumn key={index}>
-                      {item[field.name].toString()}
+                      {
+                        field.type === 'date' ?
+                          (new Date(item[field.name])).toLocaleString() :
+                          item[field.name]
+                      }
                     </TableRowColumn>
                   )
                 }
@@ -53,3 +54,4 @@ export default class DataList extends React.Component {
   }
 }
 
+export default DataList

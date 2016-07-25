@@ -20,6 +20,10 @@
     "amount": {
       "type": "number",
       "required": true
+    },
+    "state": {
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],

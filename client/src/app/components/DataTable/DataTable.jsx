@@ -1,6 +1,6 @@
 import React from 'react'
 
-import StateContainer from './state/StateContainer.jsx'
+import DataTableState from './DataTableState.jsx'
 import call from '../../api'
 
 
@@ -118,7 +118,7 @@ class DataTable extends React.Component {
 
   render() {
     return (
-      <StateContainer
+      <DataTableState
         schema={this.props.schema}
         items={this.state.items}
         create={::this.create}

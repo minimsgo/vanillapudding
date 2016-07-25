@@ -8,25 +8,17 @@ module.exports = function (Order) {
                                        amount,
                                        orderedServices,
                                        callback) {
-
     var order = {
       customerName: customerName,
       customerTel: customerTel,
       amount: amount,
-      orderDate: new Date()
+      orderDate: new Date(),
+      state: '开始'
     }
-
-    var orderedServices = [
-      {
-        name: '干洗',
-        wearType: '羽绒服',
-        price: 30,
-        id: 0
-      }
-    ]
 
     Order.create(order, function (err, createdOrder) {
       orderedServices.map(function (service) {
+        console.log(service)
         crypto.randomBytes(5, function (ex, buf) {
           var barcode = biguint(buf, 'dec')
           var initState = '开始'
@@ -52,7 +44,7 @@ module.exports = function (Order) {
         {include: 'wears'},
         function (err, orderWithWears) {
           callback(null, orderWithWears)
-      })
+        })
     })
   }
 

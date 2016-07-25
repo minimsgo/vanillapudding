@@ -1,13 +1,13 @@
 import React from 'react'
 
-import DataList from '../view/DataList.jsx'
-import Form from '../form/Form.jsx'
-import ActionBar from '../view/ActionBar.jsx'
-import Pagination from '../view/Pagination.jsx'
+import DataList from './view/DataList.jsx'
+import Form from './form/Form.jsx'
+import ActionBar from './view/ActionBar.jsx'
+import Pagination from './view/Pagination.jsx'
 
 var selection = []
 
-class StateContainer extends React.Component {
+class DataTableState extends React.Component {
 
   static propTypes = {
     items: React.PropTypes.array,
@@ -150,5 +150,5 @@ class StateContainer extends React.Component {
   }
 }
 
-export default StateContainer
+export default DataTableState
 
