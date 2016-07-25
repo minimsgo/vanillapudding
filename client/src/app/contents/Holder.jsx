@@ -1,5 +1,5 @@
 import React from 'react'
-import DataTable from './order/DataTableNext/DataTable.jsx'
+import DataTable from '../components/DataTable/DataTable.jsx'
 
 class Holder extends React.Component {
 

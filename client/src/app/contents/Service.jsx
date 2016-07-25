@@ -27,6 +27,7 @@ class Service extends React.Component {
         schema={schema}
         endpoint={"services"}
         perPage={8}
+        params={null}
       />
     )
   }

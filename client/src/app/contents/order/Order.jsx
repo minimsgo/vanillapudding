@@ -1,5 +1,5 @@
 import React from 'react'
-import DataTable from './DataTableNext/DataTable.jsx'
+import DataTable from '../../components/DataTable/DataTable.jsx'
 
 class Order extends React.Component {
 
@@ -35,7 +35,7 @@ class Order extends React.Component {
       <div>
         <DataTable
           schema={schema}
-          perPage={10}
+          perPage={8}
           endpoint="orders"
           params="filter[include][wears]"
         >

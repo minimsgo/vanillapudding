@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 
-import call from '../../../../api'
+import call from '../../../api'
 
 function Restful(ComposedComponent) {
   return class extends Component {
@@ -19,6 +19,8 @@ function Restful(ComposedComponent) {
       this.state = {
         items: [],
         total: 0,
+        where: null,
+        filter: null,
       }
     }
 
@@ -27,7 +29,13 @@ function Restful(ComposedComponent) {
     }
 
     componentWillReceiveProps(newProps) {
-      this.fetch(newProps.where, newProps.filter)
+      if (this.state.where !== newProps.where) {
+        this.fetch(newProps.where, newProps.filter)
+        this.setState({
+          where: newProps.where,
+          filter: newProps.filter,
+        })
+      }
     }
 
     fetch(where, filter) {
@@ -36,7 +44,7 @@ function Restful(ComposedComponent) {
       let endpoint = params ?
         `${this.props.endpoint}?${filter}&${params}` :
         `${this.props.endpoint}?${filter}`
-      endpoint = where ? `${endpoint}&filter[where]${where}`: endpoint
+      endpoint = where ? `${endpoint}&filter[where]${where}` : endpoint
 
       call(endpoint, 'GET').then(res => {
         if (res.status === 200) {

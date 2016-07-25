@@ -1,135 +1,48 @@
-import React from 'react'
+import React, { Component } from 'react'
 
-import DataTableState from './DataTableState.jsx'
-import call from '../../api'
+import DataList from './view/DataList.jsx'
+import ActionBar from './view/ActionBar.jsx'
+import Pagination from './view/Pagination.jsx'
+import Restful from './highorder/Restful.jsx'
+import Pageable from './highorder/Pageable.jsx'
+import Searchable from './highorder/Searchable.jsx'
 
 
-class DataTable extends React.Component {
+class View extends Component {
 
   static propTypes = {
     schema: React.PropTypes.array,
-    endpoint: React.PropTypes.string,
-    perPage: React.PropTypes.number,
-  }
+    items: React.PropTypes.array,
+    showDetail: React.PropTypes.bool,
 
-  constructor() {
-    super()
-    this.state = {
-      items: [],
-      page: 1,
-      total: 0,
-    }
-  }
+    page: React.PropTypes.number,
+    next: React.PropTypes.func,
+    prev: React.PropTypes.func,
 
-  componentDidMount() {
-    this.fetch(null, 1)
-  }
-
-  fetch(where, page) {
-    const perPage = this.props.perPage
-    const skip = (page - 1) * perPage
-    const pagination =
-      `filter[skip]=${skip}&filter[limit]=${perPage}`
-
-    const endpoint = where ?
-      `${this.props.endpoint}?${pagination}&filter${where}` :
-      `${this.props.endpoint}?${pagination}`
-
-    call(endpoint, 'GET').then(res => {
-      if (res.status !== 200) return
-      res.json().then(items => {
-        this.setState({items, page})
-      })
-    })
-
-    const countEndpoint = where ?
-      `${this.props.endpoint}/count?${where}`:
-      `${this.props.endpoint}/count`
-
-    call(countEndpoint, 'GET').then(res => {
-      if (res.status !== 200) return
-      res.json().then(countObject => {
-        const count = countObject.count
-
-        const total = count % this.props.perPage == 0 ?
-          count / this.props.perPage :
-          Math.floor(count / this.props.perPage) + 1
-        this.setState({total})
-      })
-    })
-  }
-
-  onResponse(res, success) {
-    if (res.status === 200) {
-      this.fetch(null, 1)
-      success()
-    }
-  }
-
-  search(field, keyword, page) {
-    const type = this.props.schema.filter(
-      s => s.name == field)[0].type
-
-    let where = null
-    switch (type) {
-      case 'string':
-        where = `[${field}][like]=%25${keyword}%25`
-        break
-      case 'number':
-        where = `[${field}]=${keyword}`
-        break
-      default:
-        break
-    }
-
-    if (keyword === '') {
-      this.fetch(null, page)
-    } else {
-      this.fetch(`[where]${where}`, page)
-    }
-  }
-
-  create(success) {
-    const func = function (item) {
-      call(this.props.endpoint, 'POST', item).then(res => {
-        this.onResponse(res, success)
-      })
-    }
-    return func.bind(this)
-  }
-
-  update(success) {
-    const func = function (id, item) {
-      call(`${this.props.endpoint}/${id}`, 'PUT', item).then(res => {
-        this.onResponse(res, success)
-      })
-    }
-    return func.bind(this)
-  }
-
-  delete(success) {
-    const func = function (id) {
-      call(`${this.props.endpoint}/${id}`, 'DELETE').then(res => {
-        this.onResponse(res, success)
-      })
-    }
-    return func.bind(this)
+    setWhere: React.PropTypes.func,
   }
 
   render() {
     return (
-      <DataTableState
-        schema={this.props.schema}
-        items={this.state.items}
-        create={::this.create}
-        update={::this.update}
-        delete={::this.delete}
-        search={::this.search}
-        page={this.state.page}
-        total={this.state.total}
-      />
+      <div>
+        <ActionBar
+          showDetail={this.props.showDetail}
+          schema={this.props.schema}
+          setWhere={this.props.setWhere}
+        />
+        <DataList
+          schema={this.props.schema}
+          items={this.props.items}
+        />
+        <Pagination
+          page={this.props.page}
+          total={this.props.total}
+          next={this.props.next}
+          prev={this.props.prev}
+        />
+      </div>
     )
   }
 }
 
-export default DataTable
+export default Searchable(Pageable(Restful(View)))

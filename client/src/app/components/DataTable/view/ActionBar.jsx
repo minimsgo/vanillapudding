@@ -10,28 +10,77 @@ import SearchIcon from 'material-ui/svg-icons/action/search'
 class ActionBar extends React.Component {
 
   static propTypes = {
-    open: React.PropTypes.func,
     showDetail: React.PropTypes.bool,
-    detail: React.PropTypes.func,
     schema: React.PropTypes.array,
-    searchField: React.PropTypes.string,
-    searchable: React.PropTypes.array,
-    searchKeyword: React.PropTypes.string,
-    handleSearchFieldChange: React.PropTypes.func,
-    handleSearchKeywordChange: React.PropTypes.func,
+    setWhere: React.PropTypes.func,
   }
 
   constructor() {
     super()
     this.state = {
-      keyword: ''
+      field: '',
+      keyword: '',
+      timer: null,
     }
   }
 
-  onChange(event, value) {
+  componentDidMount() {
     this.setState({
-      keyword: value
+      field: this.genSearchable()[0].name
     })
+  }
+
+  fieldChange(event, index, value) {
+    this.setState({
+      field: value,
+      keyword: '',
+    })
+    this.props.setWhere(null)
+  }
+
+  keywordChange(event, value) {
+    if (this.state.timer) {
+      clearTimeout(this.state.timer)
+    }
+    const oldValue = this.state.keyword
+    let timer = null
+    if (value !== oldValue) {
+      timer = setTimeout(() => {
+        this.props.setWhere(
+          this.genWhere(this.state.field, value)
+        )
+      }, 1000)
+    }
+    this.setState({keyword: value, timer})
+  }
+
+  genSearchable() {
+    return this.props.schema.filter(field => {
+        const searchableTypes = ['string', 'number', 'date']
+        return searchableTypes.indexOf(field.type) !== -1
+      }
+    )
+  }
+
+  genWhere(field, keyword) {
+    const type = this.props.schema.filter(
+      s => s.name === field)[0].type
+
+    let where = null
+    if (keyword !== '') {
+      switch (type) {
+        case 'string':
+          where = `[${field}][like]=%25${keyword}%25`
+          break
+        case 'number':
+          where = `[${field}]=${keyword}`
+          break
+        default:
+          break
+      }
+    }
+
+    return where
   }
 
   render() {
@@ -60,8 +109,7 @@ class ActionBar extends React.Component {
         },
       },
     }
-
-
+    const searchable = this.genSearchable()
     return (
       <Toolbar style={style.toolbar}>
         <ToolbarGroup >
@@ -70,10 +118,10 @@ class ActionBar extends React.Component {
           />
           <SelectField
             style={style.search.field}
-            value={this.props.searchField}
-            onChange={this.props.handleSearchFieldChange}
+            value={this.state.field}
+            onChange={::this.fieldChange}
           >
-            {this.props.searchable.map((field, index) =>
+            {searchable.map((field, index) =>
               <MenuItem
                 key={index}
                 value={field.name}
@@ -82,16 +130,15 @@ class ActionBar extends React.Component {
             )}
           </SelectField>
           <TextField
-            value={this.props.searchKeyword}
+            value={this.state.keyword}
             style={style.search.keyword}
-            onChange={this.props.handleSearchKeywordChange}
+            onChange={::this.keywordChange}
             hintText="搜索"
           />
         </ToolbarGroup>
         <ToolbarGroup>
           <RaisedButton
             label={this.props.showDetail ? "详细信息" : "新建"}
-            onTouchTap={this.props.open}
             primary
           />
         </ToolbarGroup>
