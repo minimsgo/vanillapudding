@@ -10,7 +10,8 @@ import SearchIcon from 'material-ui/svg-icons/action/search'
 class ActionBar extends React.Component {
 
   static propTypes = {
-    showDetail: React.PropTypes.bool,
+    edit: React.PropTypes.bool,
+    show: React.PropTypes.func,
     schema: React.PropTypes.array,
     setWhere: React.PropTypes.func,
   }
@@ -49,6 +50,7 @@ class ActionBar extends React.Component {
         this.props.setWhere(
           this.genWhere(this.state.field, value)
         )
+        this.props.resetPage()
       }, 1000)
     }
     this.setState({keyword: value, timer})
@@ -138,8 +140,9 @@ class ActionBar extends React.Component {
         </ToolbarGroup>
         <ToolbarGroup>
           <RaisedButton
-            label={this.props.showDetail ? "详细信息" : "新建"}
+            label={this.props.edit ? "编辑" : "新建"}
             primary
+            onTouchTap={this.props.show}
           />
         </ToolbarGroup>
       </Toolbar>

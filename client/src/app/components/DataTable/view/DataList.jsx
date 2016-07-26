@@ -12,11 +12,21 @@ class DataList extends Component {
   static propTypes = {
     schema: React.PropTypes.array,
     items: React.PropTypes.array,
+    select: React.PropTypes.func,
+    selectedRow: React.PropTypes.number,
+  }
+
+  select(rows) {
+    if (rows.length !== 0) {
+      this.props.select(this.props.items[rows[0]], rows[0])
+    } else {
+      this.props.select(null, -1)
+    }
   }
 
   render() {
     return (
-      <Table>
+      <Table onRowSelection={::this.select}>
         <TableHeader>
           <TableRow>
             {
@@ -33,6 +43,7 @@ class DataList extends Component {
             this.props.items.map((item, index) =>
               <TableRow
                 key={index}
+                selected={this.props.selectedRow === index}
               >
                 {
                   this.props.schema.map((field, index) =>

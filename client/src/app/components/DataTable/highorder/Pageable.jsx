@@ -22,6 +22,10 @@ function Pageable(ComposedComponent) {
       this.setState({ page: this.state.page - 1})
     }
 
+    resetPage() {
+      this.setState({ page: 1})
+    }
+
     render() {
       const limit = this.props.perPage
       const skip = (this.state.page - 1) * limit
@@ -30,6 +34,7 @@ function Pageable(ComposedComponent) {
       return <ComposedComponent
         {...this.props}
         page={this.state.page}
+        resetPage={::this.resetPage}
         next={::this.next}
         prev={::this.prev}
         filter={filter}

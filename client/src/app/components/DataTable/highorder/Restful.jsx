@@ -29,7 +29,9 @@ function Restful(ComposedComponent) {
     }
 
     componentWillReceiveProps(newProps) {
-      if (this.state.where !== newProps.where) {
+      if (this.state.where !== newProps.where ||
+        this.state.filter !== newProps.filter
+      ) {
         this.fetch(newProps.where, newProps.filter)
         this.setState({
           where: newProps.where,
@@ -75,11 +77,41 @@ function Restful(ComposedComponent) {
       })
     }
 
+    create(item, success) {
+      call(this.props.endpoint, 'POST', item).then(res => {
+        if (res.status === 200) {
+          this.fetch(null, this.props.filter)
+          success()
+        }
+      })
+    }
+
+    delete(id, success) {
+      call(`${this.props.endpoint}/${id}`, 'DELETE').then(res => {
+        if (res.status === 200) {
+          this.fetch(null, this.props.filter)
+          success()
+        }
+      })
+    }
+
+    update(id, item, success) {
+      call(`${this.props.endpoint}/${id}`, 'PUT', item).then(res => {
+        if (res.status === 200) {
+          this.fetch(null, this.props.filter)
+          success()
+        }
+      })
+    }
+
     render() {
       return <ComposedComponent
         {...this.props}
         items={this.state.items}
         total={this.state.total}
+        create={::this.create}
+        delete={::this.delete}
+        update={::this.update}
       />
     }
   }
