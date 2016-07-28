@@ -51,6 +51,7 @@ class Nav extends React.Component {
           <ListItem primaryText="订单管理" value="/order"/>
           <ListItem primaryText="服务项目" value="/service"/>
           <ListItem primaryText="挂衣号" value="/holder"/>
+          <ListItem primaryText="条码扫描" value="/wear"/>
         </SelectableList>
       </Drawer>
     )

@@ -1,13 +1,18 @@
 var crypto = require('crypto')
 var biguint = require('biguint-format')
 var app = require('../server')
+var lodash = require('lodash')
 module.exports = function (Order) {
 
   Order.createWithServices = function (customerName,
                                        customerTel,
-                                       amount,
                                        orderedServices,
                                        callback) {
+
+    var amount = orderedServices.map(service => service.price).reduce(
+      lodash.add, 0
+    )
+
     var order = {
       customerName: customerName,
       customerTel: customerTel,
@@ -54,7 +59,6 @@ module.exports = function (Order) {
       accepts: [
         {arg: 'customerName', type: 'string'},
         {arg: 'customerTel', type: 'string'},
-        {arg: 'amount', type: 'number'},
         {arg: 'orderedServices', type: 'array'},
       ],
       returns: {arg: 'createdOrder', type: 'object'}

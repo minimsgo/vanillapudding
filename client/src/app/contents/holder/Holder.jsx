@@ -1,5 +1,7 @@
 import React from 'react'
-import DataTable from '../components/DataTable/DataTable.jsx'
+import DataTable from '../../components/DataTable/DataTable.jsx'
+
+import Form from './form/Form.jsx'
 
 class Holder extends React.Component {
 
@@ -11,19 +13,27 @@ class Holder extends React.Component {
         type: 'number',
       },
       {
+        name: 'type',
+        displayName: '类型',
+        type: 'string',
+      },
+      {
         name: 'state',
         displayName: '状态',
         type: 'string',
       },
+
     ]
 
     return (
       <DataTable
         schema={schema}
-        endpoint={"holders"}
+        endpoint={'holders'}
         perPage={8}
         params={null}
-      />
+      >
+        <Form />
+      </DataTable>
     )
   }
 }

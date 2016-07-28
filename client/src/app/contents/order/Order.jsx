@@ -1,6 +1,8 @@
 import React from 'react'
 import DataTable from '../../components/DataTable/DataTable.jsx'
 
+import Form from './form/Form.jsx'
+
 class Order extends React.Component {
 
   render() {
@@ -39,6 +41,7 @@ class Order extends React.Component {
           endpoint="orders"
           params="filter[include][wears]"
         >
+          <Form />
         </DataTable>
       </div>
     )

@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 
 function Editable(ComposedComponent) {
 
-  // TODO 解决material ui table 失去焦点后无法保存已选择的 row
+  // 解决material ui table 失去焦点后无法保存已选择的 row
   var selectedItem = null
 
   return class extends Component {

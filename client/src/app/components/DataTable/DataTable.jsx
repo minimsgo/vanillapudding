@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 
 import DataList from './view/DataList.jsx'
 import ActionBar from './view/ActionBar.jsx'
@@ -59,17 +59,33 @@ class View extends Component {
           next={this.props.next}
           prev={this.props.prev}
         />
-        <Form
-          open={this.props.open}
-          edit={edit}
-          selectedItem={this.props.selectedItem}
-          schema={this.props.schema}
-          hide={this.props.hide}
-          create={this.props.create}
-          update={this.props.update}
-          delete={this.props.delete}
-          title="新建"
-        />
+
+
+        {
+          this.props.children ?
+            React.Children.map(this.props.children,
+              (child) => React.cloneElement(child, {
+                open: this.props.open,
+                edit: edit,
+                selectedItem: this.props.selectedItem,
+                schema: this.props.schema,
+                hide: this.props.hide,
+                title: "新建订单"
+              })
+            ) :
+            <Form
+              open={this.props.open}
+              edit={edit}
+              selectedItem={this.props.selectedItem}
+              schema={this.props.schema}
+              hide={this.props.hide}
+              create={this.props.create}
+              update={this.props.update}
+              delete={this.props.delete}
+              title="新建"
+            />
+        }
+
       </div>
     )
   }

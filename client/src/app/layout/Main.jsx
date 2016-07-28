@@ -10,7 +10,14 @@ class Main extends React.Component {
     super()
     this.state = {
       navOpen: false,
+      title: '',
     }
+  }
+
+  componentDidMount() {
+    this.setState({
+      title: this.genTitle(this.props.location.pathname)
+    })
   }
 
   handleTouchTapLeftIconButton() {
@@ -25,10 +32,33 @@ class Main extends React.Component {
     })
   }
 
+  genTitle(pathname) {
+    let title = ''
+    switch (pathname) {
+      case '/order':
+        title = '订单管理'
+        break
+      case '/holder':
+        title = '挂衣号'
+        break
+      case '/service':
+        title = '服务项目'
+        break
+      case '/wear':
+        title = '条码扫描'
+        break
+      default:
+        break
+    }
+    return title
+  }
+
   handleRoute(event, value) {
+
     window.location = `#${value}`
     this.setState({
       navOpen: false,
+      title: this.genTitle(value)
     })
   }
 
@@ -49,6 +79,7 @@ class Main extends React.Component {
       <MuiThemeProvider>
         <div>
           <AppBar
+            title={this.state.title}
             onLeftIconButtonTouchTap={this.handleTouchTapLeftIconButton.bind(this)}
           />
           {

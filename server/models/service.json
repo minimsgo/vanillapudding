@@ -10,12 +10,16 @@
       "type": "string",
       "required": true
     },
-    "wearType": {
+    "wear": {
       "type": "string",
       "required": true
     },
     "price": {
       "type": "number",
+      "required": true
+    },
+    "type": {
+      "type": "string",
       "required": true
     }
   },

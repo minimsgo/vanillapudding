@@ -11,8 +11,13 @@ class Service extends React.Component {
         type: 'string',
       },
       {
-        name: 'wearType',
-        displayName: '衣物类型',
+        name: 'type',
+        displayName: '类型',
+        type: 'string',
+      },
+      {
+        name: 'wear',
+        displayName: '衣物',
         type: 'string',
       },
       {
@@ -23,12 +28,14 @@ class Service extends React.Component {
     ]
 
     return (
-      <DataTable
-        schema={schema}
-        endpoint={"services"}
-        perPage={8}
-        params={null}
-      />
+      <div>
+        <DataTable
+          schema={schema}
+          endpoint={"services"}
+          perPage={8}
+          params={null}
+        />
+      </div>
     )
   }
 }

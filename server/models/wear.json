@@ -10,19 +10,11 @@
       "type": "string",
       "required": true
     },
-    "currentState": {
-      "type": "string",
+    "hasStains": {
+      "type": "boolean",
       "required": true
     },
-    "type": {
-      "type": "string",
-      "required": true
-    },
-    "serviceName": {
-      "type": "string",
-      "required": true
-    },
-    "states": {
+    "steps": {
       "type": [
         "object"
       ],
