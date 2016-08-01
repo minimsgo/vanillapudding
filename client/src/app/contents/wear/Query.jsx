@@ -15,12 +15,15 @@ class Query extends Component {
       open: false,
       wear: {
         order: {},
+        service: {},
+        holder: {},
+        steps: [],
       },
     }
   }
 
   componentDidMount() {
-    this.handleDetected('31738282461')
+    this.handleDetected('998224292476')
   }
 
   hide() {
@@ -32,7 +35,7 @@ class Query extends Component {
   handleDetected(barcode) {
     this.setState({ barcode })
     const endpoint =
-      `wears?filter[include][order]&filter[where][barcode]=${barcode}`
+      `wears?filter[include]=holder&filter[include]=service&filter[include]=order&filter[where][barcode]=${barcode}`
     call(endpoint, 'GET').then(res => {
       res.json().then(wears => {
         this.setState({

@@ -39,7 +39,7 @@ class Order extends React.Component {
           schema={schema}
           perPage={8}
           endpoint="orders"
-          params="filter[include][wears]"
+          params="filter[include][wears]&filter[order]=id%20DESC"
         >
           <Form />
         </DataTable>

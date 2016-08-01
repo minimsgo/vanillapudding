@@ -13,6 +13,7 @@ class Create extends Component {
     open: React.PropTypes.bool,
     hide: React.PropTypes.func,
     create: React.PropTypes.func,
+    titleStyle: React.PropTypes.object,
   }
 
   create() {
@@ -40,11 +41,13 @@ class Create extends Component {
         ref={field.name}
       />
     )
+
     return (
       <Dialog
         title={this.props.title}
         modal={false}
         actions={actions}
+        titleStyle={this.props.titleStyle}
         open={this.props.open}
         autoScrollBodyContent={true}>
         {fields}

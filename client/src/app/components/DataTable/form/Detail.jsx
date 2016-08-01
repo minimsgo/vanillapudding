@@ -13,6 +13,7 @@ class Detail extends React.Component {
     submit: React.PropTypes.func,
     hide: React.PropTypes.func,
     item: React.PropTypes.object,
+    titleStyle: React.PropTypes.object,
   }
 
   update() {
@@ -56,6 +57,7 @@ class Detail extends React.Component {
         title={this.props.title}
         modal={false}
         actions={actions}
+        titleStyle={this.props.titleStyle}
         open={this.props.open}
         autoScrollBodyContent={true}>
         {fields}

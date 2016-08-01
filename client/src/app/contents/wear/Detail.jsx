@@ -2,7 +2,8 @@ import React, {Component} from 'react'
 import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
 import TextField from 'material-ui/TextField'
-
+import lodash from 'lodash'
+import { getCurrentStep } from '../step'
 import call from '../../api'
 
 class Detail extends Component {
@@ -11,7 +12,10 @@ class Detail extends Component {
     super()
     this.state = {
       wear: {
-        order: {}
+        order: {},
+        service: {},
+        holder: {},
+        steps: [],
       }
     }
   }
@@ -25,13 +29,15 @@ class Detail extends Component {
 
   nextStep() {
     const id = this.state.wear.id
-    call(`wears/${id}/toNextState`, 'GET').then(res => {
+    call(`wears/${id}/nextStep`, 'GET').then(res => {
       if (res.status === 200) {
-        res.json().then(updatedWear => {
-          this.setState({wear: updatedWear.updatedWear})
-        })
+        this.props.hide()
       }
     })
+  }
+
+  currentStep() {
+    return lodash.max(this.state.wear.steps.map(step => step.step))
   }
 
   render() {
@@ -43,7 +49,7 @@ class Detail extends Component {
       <FlatButton
         label="下一流程"
         primary
-        disabled={this.state.wear.currentState == "结束"}
+        disabled={this.currentStep() >= 2}
         onTouchTap={::this.nextStep}
       />
     ]
@@ -53,9 +59,10 @@ class Detail extends Component {
       maxWidth: 'none',
     }
 
+
     return (
       <Dialog
-        title="WEAR"
+        title="衣物详情"
         modal={false}
         actions={actions}
         open={this.props.open}
@@ -67,29 +74,46 @@ class Detail extends Component {
           floatingLabelText="客户姓名"
           disabled
         />
+        &nbsp;
         <TextField
           value={this.state.wear.order.customerTel}
           floatingLabelText="客户电话"
           disabled
         />
-        <TextField
-          value={this.state.wear.serviceName}
-          floatingLabelText="服务项目"
-          disabled
-        />
-        <TextField
-          value={this.state.wear.type}
-          floatingLabelText="衣物类型"
-          disabled
-        />
+        &nbsp;
         <TextField
           value={this.state.wear.order.orderDate}
           floatingLabelText="下单日期"
           disabled
         />
+        &nbsp;
         <TextField
-          value={this.state.wear.currentState}
-          floatingLabelText="状态"
+          value={this.state.wear.service.name}
+          floatingLabelText="服务项目"
+          disabled
+        />
+        &nbsp;
+        <TextField
+          value={this.state.wear.service.type}
+          floatingLabelText="类型"
+          disabled
+        />
+        &nbsp;
+        <TextField
+          value={this.state.wear.service.wear}
+          floatingLabelText="衣服"
+          disabled
+        />
+        &nbsp;
+        <TextField
+          value={this.state.wear.holder.code}
+          floatingLabelText="挂衣号"
+          disabled
+        />
+        &nbsp;
+        <TextField
+          value={getCurrentStep(this.state.wear.steps)}
+          floatingLabelText="当前流程"
           disabled
         />
       </Dialog>
@@ -98,3 +122,4 @@ class Detail extends Component {
 }
 
 export default Detail
+

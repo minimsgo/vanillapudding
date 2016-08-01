@@ -1,33 +1,23 @@
 var lodash = require('lodash')
 
 function next(current) {
-  switch (current) {
-    case '开始':
-      return '就绪';
-    case '就绪':
-      return '结束';
-    case '结束':
-      return null;
-    default:
-      break;
-  }
+  return current !== 3 ? current + 1 : null
 }
 
 module.exports = function (Wear) {
 
-  Wear.toNextState = function (id, callback) {
+  Wear.nextStep = function (id, callback) {
     Wear.findById(id, function (err, wear) {
-      var currentState = wear.currentState
-      var nextState = next(currentState)
-      if (nextState) {
-        var newStates = lodash.concat(wear.states, {
+      var currentStep = lodash.max(wear.steps.map(step => step.step))
+      var nextStep = next(currentStep)
+      if (nextStep) {
+        var newSteps = lodash.concat(wear.steps, {
           updateDate: new Date(),
-          state: nextState
+          step: nextStep
         })
         wear.updateAttributes(
           {
-            'currentState': nextState,
-            'states': newStates
+            'steps': newSteps
           },
           function (err, updatedWear) {
             callback(null, updatedWear)
@@ -39,9 +29,9 @@ module.exports = function (Wear) {
     })
   }
 
-  Wear.remoteMethod('toNextState', {
+  Wear.remoteMethod('nextStep', {
     accepts: {arg: 'id', type: 'number'},
-    http: {path: '/:id/toNextState', verb: 'get'},
+    http: {path: '/:id/nextStep', verb: 'get'},
     returns: {arg: 'updatedWear', type: 'object'}
   })
 };

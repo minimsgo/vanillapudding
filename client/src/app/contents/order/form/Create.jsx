@@ -10,6 +10,8 @@ import TableRow from 'material-ui/Table/TableRow'
 import TableHeader from 'material-ui/Table/TableHeader'
 import TableRowColumn from 'material-ui/Table/TableRowColumn'
 import TableBody from 'material-ui/Table/TableBody'
+import Checkbox from 'material-ui/Checkbox'
+
 
 import lodash from 'lodash'
 import call from '../../../api'
@@ -28,8 +30,11 @@ class Create extends Component {
     super()
     this.state = {
       services: [],
-      orderedServices: [],
-      selectedServiceName: '',
+      wears: [],
+      serviceType: '',
+      serviceName: '',
+      hasStains: false,
+      serviceWear: '',
     }
   }
 
@@ -45,27 +50,57 @@ class Create extends Component {
     const order = {
       customerTel: this.refs.customerTel.getValue(),
       customerName: this.refs.customerName.getValue(),
-      orderedServices: this.state.orderedServices,
+      wears: this.state.wears,
     }
 
-    call('orders/createWithServices', 'POST', order).then(
+    call('orders/createNew', 'POST', order).then(
       res => {
         if (res.status === 200) this.props.hide()
       }
     )
   }
 
-  handleServiceChange(event, index, value) {
-    this.setState({selectedServiceName: value})
+  handleServiceTypeChange(event, index, value) {
+    this.setState({serviceType: value})
   }
 
-  handleWearTypeChange(event, index, value) {
+  handleServiceNameChange(event, index, value) {
+    this.setState({serviceName: value})
+  }
+
+  handleHasStainsChecked(event, isInputChecked) {
+    this.setState({hasStains: isInputChecked})
+  }
+
+  handleServiceWearChange(event, index, value) {
+    this.setState({serviceWear: value})
+
     const selectedService = this.state.services.filter(
-      service => service.id === value
+      service =>
+      service.type === this.state.serviceType &&
+      service.name === this.state.serviceName &&
+      service.wear === value
     )[0]
-    let orderedServices = this.state.orderedServices
-    orderedServices.push(selectedService)
-    this.setState({orderedServices})
+
+    const wear = {
+      service: selectedService,
+      hasStains: this.state.hasStains
+    }
+
+    let wears = this.state.wears
+    wears.push(wear)
+    this.setState({
+      wears,
+      serviceType: '',
+      serviceName: '',
+      hasStains: false,
+      serviceWear: '',
+    })
+  }
+
+  close() {
+    this.setState({wears: []})
+    this.props.hide()
   }
 
   render() {
@@ -76,7 +111,7 @@ class Create extends Component {
     const actions = [
       <FlatButton
         label="取消"
-        onTouchTap={this.props.hide}
+        onTouchTap={::this.close}
       />,
       <FlatButton
         label="确认"
@@ -85,9 +120,28 @@ class Create extends Component {
       />,
     ]
 
-    const serviceNames = lodash.uniq(
-      this.state.services.map(service => service.name)
+    const serviceTypes = lodash.uniq(
+      this.state.services.map(service => service.type)
     )
+
+    const serviceNames = lodash.uniq(
+      this.state.services.filter(
+        service => service.type === this.state.serviceType
+      ).map(service => service.name)
+    )
+
+    const serviceWears = lodash.uniq(
+      this.state.services.filter(
+        service => service.type === this.state.serviceType &&
+        service.name === this.state.serviceName
+      ).map(service => service.wear)
+    )
+
+    const amount =
+      this.state.wears
+        .map(wear => wear.service.price)
+        .reduce(lodash.add, 0)
+
     return (
       <Dialog
         title={this.props.title}
@@ -112,11 +166,7 @@ class Create extends Component {
             hintText="金额"
             floatingLabelText="金额"
             disabled
-            value={
-              this.state.orderedServices.map(
-                service => service.price
-              ).reduce(lodash.add, 0)
-            }
+            value={ amount }
           />
         </div>
         <Table>
@@ -124,53 +174,84 @@ class Create extends Component {
             <TableRow>
               <TableHeaderColumn>
                 <SelectField
-                  hintText="服务项目"
-                  value={this.state.selectedServiceName}
-                  onChange={::this.handleServiceChange}
+                  hintText="类型"
+                  autoWidth
+                  value={this.state.serviceType}
+                  onChange={::this.handleServiceTypeChange}
                 >
-                  { serviceNames.map((name, index) =>
-                    <MenuItem
-                      key={index}
-                      value={name}
-                      primaryText={name}
-                    />
-                  )}
+                  {
+                    serviceTypes.map((serviceType, index) =>
+                      <MenuItem
+                        key={index}
+                        value={serviceType}
+                        primaryText={serviceType}
+                      />
+                    )
+                  }
                 </SelectField>
               </TableHeaderColumn>
               <TableHeaderColumn>
                 <SelectField
-                  hintText="衣物类型"
-                  onChange={::this.handleWearTypeChange}
+                  hintText="服务项目"
+                  value={this.state.serviceName}
+                  onChange={::this.handleServiceNameChange}
                 >
                   {
-                    this.state.services.filter(
-                      service => service.name === this.state.selectedServiceName
-                    ).map((service, index) =>
+                    serviceNames.map((serviceName, index) =>
                       <MenuItem
                         key={index}
-                        value={service.id}
-                        primaryText={service.wearType}
+                        value={serviceName}
+                        primaryText={serviceName}
                       />
                     )
                   }
-
                 </SelectField>
               </TableHeaderColumn>
-              <TableHeaderColumn>价格</TableHeaderColumn>
+              <TableHeaderColumn>
+                <Checkbox
+                  label="瑕疵"
+                  checked={this.state.hasStains}
+                  onCheck={::this.handleHasStainsChecked}
+                />
+              </TableHeaderColumn>
+              <TableHeaderColumn>
+                <SelectField
+                  hintText="衣物"
+                  value={this.state.serviceWear}
+                  onChange={::this.handleServiceWearChange}
+                >
+                  {
+                    serviceWears.map((serviceWear, index) =>
+                      <MenuItem
+                        key={index}
+                        value={serviceWear}
+                        primaryText={serviceWear}
+                      />
+                    )
+                  }
+                </SelectField>
+              </TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody>
             {
-              this.state.orderedServices.map((service, index) =>
+              this.state.wears.map((wear, index) =>
                 <TableRow key={index}>
                   <TableRowColumn>
-                    {service.name}
+                    {wear.service.type}
                   </TableRowColumn>
                   <TableRowColumn>
-                    {service.wearType}
+                    {wear.service.name}
                   </TableRowColumn>
                   <TableRowColumn>
-                    {service.price}
+                    <Checkbox
+                      label="瑕疵"
+                      checked={wear.hasStains}
+                      disabled
+                    />
+                  </TableRowColumn>
+                  <TableRowColumn>
+                    {wear.service.wear}
                   </TableRowColumn>
                 </TableRow>
               )

@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import Create from './Create.jsx'
 import Detail from './Detail.jsx'
 
+import {cyan500} from 'material-ui/styles/colors'
+
 class Form extends Component {
 
   static propTypes = {
@@ -18,11 +20,18 @@ class Form extends Component {
   }
 
   render() {
+
+    const titleStyle = {
+      // backgroundColor: cyan500,
+      backgroundColor: 'white',
+    }
+
     return this.props.selectedItem ?
       <Detail
         title="编辑"
         open={this.props.open}
         schema={this.props.schema}
+        titleStyle={titleStyle}
         hide={this.props.hide}
         item={this.props.selectedItem}
         update={this.props.update}
@@ -32,6 +41,7 @@ class Form extends Component {
         title="新建"
         open={this.props.open}
         schema={this.props.schema}
+        titleStyle={titleStyle}
         hide={this.props.hide}
         create={this.props.create}
       />

@@ -20,7 +20,7 @@ class Form extends Component {
   render() {
     return this.props.selectedItem ?
       <Detail
-        title="编辑"
+        title="订单详情"
         open={this.props.open}
         schema={this.props.schema}
         hide={this.props.hide}
@@ -29,7 +29,7 @@ class Form extends Component {
         delete={this.props.delete}
       /> :
       <Create
-        title="新建"
+        title="新建订单"
         open={this.props.open}
         schema={this.props.schema}
         hide={this.props.hide}
