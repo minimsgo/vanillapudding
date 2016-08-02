@@ -11,7 +11,6 @@ import TableBody from 'material-ui/Table/TableBody'
 import Checkbox from 'material-ui/Checkbox'
 
 import call from '../../../api'
-import { getCurrentStep } from '../../step'
 import lodash from 'lodash'
 
 class Detail extends React.Component {
@@ -29,7 +28,8 @@ class Detail extends React.Component {
     this.state = {
       order: {
         wears: []
-      }
+      },
+      selectedRow: -1,
     }
   }
 
@@ -45,7 +45,25 @@ class Detail extends React.Component {
     )
   }
 
+  select(rows) {
+    const row = rows.length !== 0 ? rows[0] : -1
+    this.setState({selectedRow: row})
+  }
+
+  nextStep() {
+    const id = this.state.order.wears[this.state.selectedRow].id
+    call(`wears/${id}/nextStep`, 'GET').then(res => {
+      if (res.status === 200) {
+        this.props.hide()
+      }
+    })
+  }
+
   render() {
+    const selectedWear = this.state.order.wears[this.state.selectedRow]
+    const nextDisabled = this.state.selectedRow === -1 ||
+      selectedWear.currentStep !== '就绪'
+
     const contentStyle = {
       width: '100%',
       maxWidth: 'none',
@@ -54,6 +72,12 @@ class Detail extends React.Component {
       <FlatButton
         label="取消"
         onTouchTap={this.props.hide}
+      />,
+      <FlatButton
+        label="下一流程"
+        primary
+        disabled={nextDisabled}
+        onTouchTap={::this.nextStep}
       />,
     ]
 
@@ -90,7 +114,7 @@ class Detail extends React.Component {
             disabled
           />
         </div>
-        <Table>
+        <Table onRowSelection={::this.select}>
           <TableHeader>
             <TableRow>
               <TableHeaderColumn>条形码</TableHeaderColumn>
@@ -105,7 +129,9 @@ class Detail extends React.Component {
           <TableBody>
             {
               this.state.order.wears.map((wear, index) =>
-                <TableRow key={index}>
+                <TableRow
+                  selected={this.state.selectedRow === index}
+                  key={index}>
                   <TableRowColumn>
                     {wear.barcode}
                   </TableRowColumn>
@@ -128,9 +154,7 @@ class Detail extends React.Component {
                     {wear.holder.code}
                   </TableRowColumn>
                   <TableRowColumn>
-                    {
-                      getCurrentStep(wear.steps)
-                    }
+                    {wear.currentStep}
                   </TableRowColumn>
                 </TableRow>
               )

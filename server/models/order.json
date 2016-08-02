@@ -20,6 +20,14 @@
     "amount": {
       "type": "number",
       "required": true
+    },
+    "wearsCount": {
+      "type": "number",
+      "required": true
+    },
+    "currentStep": {
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],

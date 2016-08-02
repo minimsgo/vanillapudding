@@ -10,14 +10,21 @@ module.exports = function (Order) {
       lodash.add, 0
     )
 
+    var now = new Date()
+
+    var currentStep = '开始'
+
     var order = {
       customerName: customerName,
       customerTel: customerTel,
       amount: amount,
-      orderDate: new Date(),
+      orderDate: now,
+      currentStep: currentStep,
+      wearsCount: wears.length
     }
 
     Order.create(order, (err, createdOrder) => {
+      console.log(err)
       wears.map(wear => {
         const condition = {
           where: {
@@ -35,7 +42,7 @@ module.exports = function (Order) {
             holderId: holder.id,
             barcode: barcode,
             hasStains: wear.hasStains,
-            steps: [{step: 0, updateDate: new Date()}]
+            currentStep: currentStep
           }
           app.models.Wear.create(newWear, (err, createdWear) => {
             console.log(createdWear)

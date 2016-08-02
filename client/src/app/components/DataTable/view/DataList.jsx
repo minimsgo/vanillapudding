@@ -6,6 +6,8 @@ import TableHeader from 'material-ui/Table/TableHeader'
 import TableRowColumn from 'material-ui/Table/TableRowColumn'
 import TableBody from 'material-ui/Table/TableBody'
 
+import formatDate from '../../../utils/date'
+
 //TODO 大数据量性能问题
 class DataList extends Component {
 
@@ -50,7 +52,7 @@ class DataList extends Component {
                     <TableRowColumn key={index}>
                       {
                         field.type === 'date' ?
-                          (new Date(item[field.name])).toLocaleString() :
+                          formatDate(item[field.name]) :
                           item[field.name]
                       }
                     </TableRowColumn>

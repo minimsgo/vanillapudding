@@ -14,10 +14,8 @@
       "type": "boolean",
       "required": true
     },
-    "steps": {
-      "type": [
-        "object"
-      ],
+    "currentStep": {
+      "type": "string",
       "required": true
     }
   },

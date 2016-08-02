@@ -17,13 +17,12 @@ class Query extends Component {
         order: {},
         service: {},
         holder: {},
-        steps: [],
       },
     }
   }
 
   componentDidMount() {
-    this.handleDetected('998224292476')
+    // this.handleDetected('97330750')
   }
 
   hide() {

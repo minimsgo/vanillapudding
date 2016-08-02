@@ -2,7 +2,7 @@ const randomstring = require('randomstring')
 
 function genBarcode() {
   return randomstring.generate({
-    length: '12',
+    length: '8',
     charset: '0123456789'
   })
 }

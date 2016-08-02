@@ -3,7 +3,6 @@ import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
 import TextField from 'material-ui/TextField'
 import lodash from 'lodash'
-import { getCurrentStep } from '../step'
 import call from '../../api'
 
 class Detail extends Component {
@@ -15,11 +14,9 @@ class Detail extends Component {
         order: {},
         service: {},
         holder: {},
-        steps: [],
       }
     }
   }
-
 
   componentWillReceiveProps(newProps) {
     this.setState({
@@ -36,10 +33,6 @@ class Detail extends Component {
     })
   }
 
-  currentStep() {
-    return lodash.max(this.state.wear.steps.map(step => step.step))
-  }
-
   render() {
     const actions = [
       <FlatButton
@@ -49,7 +42,10 @@ class Detail extends Component {
       <FlatButton
         label="下一流程"
         primary
-        disabled={this.currentStep() >= 2}
+        disabled={
+          this.state.wear.currentStep === '就绪' ||
+          this.state.wear.currentStep === '结束'
+        }
         onTouchTap={::this.nextStep}
       />
     ]
@@ -101,7 +97,7 @@ class Detail extends Component {
         &nbsp;
         <TextField
           value={this.state.wear.service.wear}
-          floatingLabelText="衣服"
+          floatingLabelText="衣物"
           disabled
         />
         &nbsp;
@@ -112,7 +108,7 @@ class Detail extends Component {
         />
         &nbsp;
         <TextField
-          value={getCurrentStep(this.state.wear.steps)}
+          value={this.state.wear.currentStep}
           floatingLabelText="当前流程"
           disabled
         />

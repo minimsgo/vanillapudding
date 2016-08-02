@@ -28,8 +28,13 @@ class Order extends React.Component {
         type: 'number',
       },
       {
-        name: 'state',
-        displayName: '状态',
+        name: 'wearsCount',
+        displayName: '衣物数量',
+        type: 'number',
+      },
+      {
+        name: 'currentStep',
+        displayName: '当前流程',
         type: 'string',
       },
     ]
@@ -39,7 +44,7 @@ class Order extends React.Component {
           schema={schema}
           perPage={8}
           endpoint="orders"
-          params="filter[include][wears]&filter[order]=id%20DESC"
+          params="filter[where][currentStep][neq]=结束&filter[include][wears]&filter[order]=id%20DESC"
         >
           <Form />
         </DataTable>

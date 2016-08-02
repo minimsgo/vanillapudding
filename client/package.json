@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "npm run dev",
-    "dev": "webpack-dev-server --config webpack-dev-server.config.js --progress --colors --host 0.0.0.0 --hot --inline"
+    "dev": "webpack-dev-server --config webpack-dev-server.config.js --progress --colors --host 0.0.0.0 --hot --inline",
+    "build": "webpack --config webpack.config.js --progress --colors --profile"
   },
   "devDependencies": {
     "babel-core": "^6.10.4",

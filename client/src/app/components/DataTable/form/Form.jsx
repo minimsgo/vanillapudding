@@ -22,8 +22,8 @@ class Form extends Component {
   render() {
 
     const titleStyle = {
-      // backgroundColor: cyan500,
-      backgroundColor: 'white',
+      backgroundColor: cyan500,
+      color: 'white',
     }
 
     return this.props.selectedItem ?
